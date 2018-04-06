@@ -2,8 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\javascripts",
-    "\\javascripts\\jquery.form-4.2.2"
+    "\\javascripts\\socket.io-client-1.7.3"
   ],
-  "SelectedNode": "\\icons",
+  "SelectedNode": "\\backgroundPage.js",
   "PreviewInSolutionExplorer": false
 }

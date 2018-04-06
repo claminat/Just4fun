@@ -1,4 +1,4 @@
-﻿console.log('backgroundScripts...');
+﻿+console.log('backgroundScripts...');
 var icon32 = 'icons/favorites512.png';
 // Copyright 2017 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be

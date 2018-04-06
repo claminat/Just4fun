@@ -1,24 +1,6 @@
 ﻿console.log('backgroundPageJs...');
 
 
-var socketPromise = new Promise(function (resolve, reject) {
-    var socketUrl = 'http://localhost:3002';
-    //var socketUrl = 'http://202.143.111.30:3002';
-    var socket = io.connect(socketUrl);
-    socket.on('connect', function (data) {
-        socket.emit('join', 'Hello from Google Ext');
-        console.log('Listen socket: ', socketUrl);
-
-        socket.on('broad', function (data) {
-            var msg = '[' + new Date().toLocaleString("en-US") + '] Client recieved (broad): ' + data;
-            console.log(msg);
-        });
-        if (socket)
-            resolve(socket);
-    });
-});
-
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 chrome.contextMenus.create({
     id: 'open',
@@ -26,43 +8,99 @@ chrome.contextMenus.create({
     contexts: ["all", "image", "video"]
 });
 
+chrome.runtime.onMessage.addListener(function (request) {
+    console.log('request', 'openRedirect', request);
+    if (request.type === 'openRedirect') {
+        var data = request.data; console.log('data', data);
+        var srcUrl = data.downloadItem.url; console.log('srcUrl', srcUrl);
 
-
+        //chrome.tabs.create({ url: chrome.extension.getURL('redirect.html'), active: false }, function (tab) {
+        //    chrome.windows.create({// After the tab has been created, open a window to inject the tab
+        //        tabId: tab.id,type: 'popup',focused: true // incognito, top, left, ...
+        //    }, function (window) {
+        //        chrome.runtime.sendMessage({ data: srcUrl, type: 'callRedirect' });
+        //    });
+        //});
+    }
+    console.log('request', 'openRedirect', '------------------------------------------------');
+});
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
-    var pageUrl = info.pageUrl;
-    var srcUrl = info.srcUrl;
-
+    console.log('contextMenus.onClicked');
+    var pageUrl = info.pageUrl; console.log('pageUrl', pageUrl);
+    var srcUrl = info.srcUrl; console.log('srcUrl', srcUrl);
+    var title = tab.title;
+    var caption = title.substring(title.lastIndexOf("“") + 1, title.lastIndexOf("”"));
+    var downloadItem = { srcUrl: srcUrl, caption: caption}
     console.log('tab', tab);
-    chrome.tabs.create({ url: chrome.extension.getURL('redirect.html'), active: false }, function (tab) {
-        console.log('tab->', tab);
-        // After the tab has been created, open a window to inject the tab
-        chrome.windows.create({
-            tabId: tab.id,
-            type: 'popup',
-            focused: true
-            // incognito, top, left, ...
-        }, function (window) {
-            console.log('window->', window);
-            chrome.runtime.sendMessage({ data: srcUrl, type: 'request_redirect' });
-        });
-    });
-    
-    var rootDomain = extractRootDomain(pageUrl);
-   
-    if (rootDomain) {
-        if (isDomain(pageUrl, "flickr")) {
-            closeTab(tab);
-            contextMenusFlickr(pageUrl);
-        }
-        else if (isDomain(pageUrl, "tumblr")) {
-            contextMenusTumblr(pageUrl, srcUrl);
-        }
-        else {
-            createNotification('Invalid domain!');
+    //popup redirect
+    if (srcUrl) {
+        if (checkURL(srcUrl)) {
+            console.log('downloadItem', downloadItem);
+            openRedirect(downloadItem);
+        } else {
+            createNotification('Invalid Url!');
         }
     }
+
+    ////download
+    //var rootDomain = extractRootDomain(pageUrl);
+    //if (rootDomain) {
+    //    if (isDomain(pageUrl, "flickr")) {
+    //        closeTab(tab);
+    //        contextMenusFlickr(pageUrl);
+    //    }
+    //    else if (isDomain(pageUrl, "tumblr")) {
+    //        contextMenusTumblr(pageUrl, srcUrl);
+    //    }
+    //    else {
+    //        //createNotification('Invalid Url!');
+    //    }
+    //}
+    console.log('contextMenus.onClicked', '------------------------------------------------');
+
 });
+
+function openRedirect(downloadItem) {
+    var w = 400;
+    var h = 400;
+
+    // Fixes dual-screen position                         Most browsers      Firefox
+    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX;
+    var dualScreenTop = window.screenTop != undefined ? window.screenTop : window.screenY;
+
+    var width = screen.width; console.log('screenWidth', width);
+    var height = screen.height; console.log('screenHeight', height);
+
+    //var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+    //var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+    var top = ((height / 2) - (h / 2)) + dualScreenTop;
+
+
+    ////var width = $(this).width(); console.log('width', width);
+    ////var height = $(this).height(); console.log('height', height);
+
+    
+
+    //var left = ((screenWidth / 2) - (w / 2)) ;
+    //var top = ((screenHeight / 2) - (h / 2));
+
+    chrome.tabs.create({ url: chrome.extension.getURL('redirect.html'), active: false }, function (tab) {
+        // After the tab has been created, open a window to inject the tab
+        chrome.windows.create({
+            tabId: tab.id, type: 'popup', focused: true,// incognito, top, left, ...
+            top:top,left:left,width:w,height:h
+        }, function (window) {
+            chrome.runtime.sendMessage({ data: downloadItem, type: 'callRedirect' });
+        });
+    });
+}
+
+
+
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 chrome.browserAction.onClicked.addListener(function (tab) {
     var pageUrl = tab.url;
@@ -104,9 +142,6 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 //    //rulesets["hostname"](item, suggest);
 //    return true;
 //});
-
-
-
 
 ////config directory download
 //rulesets["hostname"] = function (item, suggest) {

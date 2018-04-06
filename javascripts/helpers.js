@@ -167,3 +167,19 @@ function has(str,txt) {
         return false;
     }
 }
+
+
+//valid
+function checkURL(url) {
+    return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+}
+function isEmpty(value) {
+    return typeof value == 'string' && !value.trim() || typeof value == 'undefined' || value === null;
+}
+
+
+//encode & decode
+
+function encodeData(s){
+    return encodeURIComponent(s).replace(/\-/g, "%2D").replace(/\_/g, "%5F").replace(/\./g, "%2E").replace(/\!/g, "%21").replace(/\~/g, "%7E").replace(/\*/g, "%2A").replace(/\'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29");
+}

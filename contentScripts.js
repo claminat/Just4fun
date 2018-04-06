@@ -38,7 +38,7 @@ var downloads = [];
 preLoad();
 
 function preLoad() {
-    console.log('----------start-', arguments.callee.name,'----------');
+    console.log('----------start-', arguments.callee.name, '----------');
     var pageUrl = window.location.href;
     //instagram
     $("div").removeClass("_si7dy");
@@ -62,7 +62,7 @@ function prepareDownload() {
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
         if (isDomain(pageUrl, "instagram")) {
-             prepareDownloadInstagram(pageUrl);
+            prepareDownloadInstagram(pageUrl);
         } else if (isDomain(pageUrl, "flickr")) {
 
         } else if (isDomain(pageUrl, "tumblr")) {
@@ -77,6 +77,7 @@ function prepareDownloadInstagram() {
     console.log('------------------------------------------------');
     var pageUrl = window.location.href;
     var folder = getFolder(pageUrl);
+    var caption = getCaption(pageUrl);
     console.log('------------------------------------------------');
     //url
     $("meta[name='medium']").map(function (index) {
@@ -92,7 +93,7 @@ function prepareDownloadInstagram() {
                 //console.log('script', index, this);
                 var html = $(this).html();
                 if (has(html, 'window._sharedData =')) {
-                    console.log('script[', index,']', this);
+                    console.log('script[', index, ']', this);
                     var script = html.slice(0, -1).replace('window._sharedData =', ''); //console.log('script', index, script);
                     var json = jQuery.parseJSON(script); //console.log('json', json);
                     //var postPages = json.entry_data.PostPage[0];//console.log('postPage', postPages);
@@ -107,7 +108,8 @@ function prepareDownloadInstagram() {
                                     var src = display_url;
                                     var download = {
                                         url: src,
-                                        folder: folder
+                                        folder: folder,
+                                        caption: caption
                                     };
                                     downloads.push(download);
                                     console.log('download', download);
@@ -119,7 +121,8 @@ function prepareDownloadInstagram() {
                                 var src = display_url;
                                 var download = {
                                     url: src,
-                                    folder: folder
+                                    folder: folder,
+                                    caption: caption
                                 };
                                 downloads.push(download);
                                 console.log('download', download);
@@ -139,7 +142,8 @@ function prepareDownloadInstagram() {
                 var src = this.content; console.log('src', src);
                 var download = {
                     url: src,
-                    folder: folder
+                    folder: folder,
+                    caption: caption
                 };
                 downloads.push(download);
                 console.log('download', download);
@@ -154,7 +158,7 @@ function prepareDownloadTumblr() {
     //folder
     var pageUrl = window.location.href;
     var folder = getFolder(pageUrl);
-  
+
     var postId = pageUrl.split('/')[4]; console.log(postId);
     console.log('------------------------------------------------');
     $("meta[property='og:image']").map(function (index) {
@@ -175,7 +179,7 @@ function prepareDownloadTumblr() {
             url: src,
             folder: folder
         };
-        
+
         downloads.push(download);
         console.log('download', download);
     });
@@ -202,52 +206,6 @@ function prepareDownloadTumblr() {
 
 if (debug) {
     var pageUrl = window.location.href;
-    
-    //$("img").map(function (index) {
-    //    console.log('img', index, this);
-    //    var attr = $(this).attr('srcset');
-    //    if (typeof attr !== typeof undefined && attr !== false) {
-    //        console.log('img', index, this);
-    //    }
-    //    return this.src;
-    //});
-    //var url = "https://www.instagram.com/p/BgW8pj5Bx0R/?taken-by=portraits_vision";
-    //$.post("https://igeturl.com/get.php", { url: url })
-    //    .done(function (data) {
-    //        console.log("Data Loaded: " + data);
-    //    });
-    //$.ajax({
-    //    url: 'https://www.google.com.vn/',
-    //    success: function (data) {
-    //        console.log('data', data);
-    //    }
-    //});
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //var url = "https://www.instagram.com/p/BgW8pj5Bx0R/?taken-by=portraits_vision";
-    //var arrayUrl = url.split('/'); console.log(arrayUrl);
-    //var key = arrayUrl[4];
-    //console.log('key', key);
-
-    //var src = 'https://instagr.am/p/' + key + '/media/?size=l'; console.log('src', src);
-    ////var src = 'https://api.instagram.com/oembed?url=https://www.instagram.com/p/BgW8pj5Bx0R';
-    //$.ajax({
-    //    type: 'GET',
-    //    crossDomain: true,
-    //    url: src,
-    //    cache: false,
-    //    dataType: 'jsonp',
-    //    success: function (data) {
-    //        console.log("Success");
-    //        try {
-    //            console.log(data);
-    //        } catch (err) {
-    //            console.log('catch->err', err);
-    //        }
-    //    },
-    //    error: function (err) {
-    //        console.log('error->err', err);
-    //    }
-    //});
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -267,46 +225,21 @@ $(document).on("mouseout", 'img', imgMouseOuted);
 
 
 $('#barImgId').click(function () {
+    console.log("'#barImgId').click");
     console.log('chrome.storage.local.get(["data"], function (data)');
-    chrome.storage.local.get(["data"], function (item) {
-        if (item) {
-            console.log('item', item);
-            chrome.runtime.sendMessage({ data: item.data, text: "download" }, function (response) { });
+    chrome.storage.local.get(["downloadItem"], function (downloadItem) {
+        if (downloadItem) {
+            console.log('downloadItem', downloadItem);
+            var data = { type: 'openRedirect', data: downloadItem };
+            chrome.runtime.sendMessage(data);
+
+            //chrome.runtime.sendMessage({ data: data, text: "download" }, function (response) { });
+
         }
     });
 });
 
 
-
-//Instagram
-function imgMouseOveredInstagram(url) {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
-    var pageUrl = window.location.href;
-    var folder = getFolder(pageUrl);
-    url = "https://www.instagram.com/p/BgW8pj5Bx0R/?taken-by=portraits_vision";
-
-    console.log('------------------------------------------------');
-
-    //$.post("https://igeturl.com/get.php", { url: url })
-    //    .done(function (data) {
-    //        console.log("Data Loaded: " + data);
-    //    });
-
-    //$.ajax({
-    //    type: 'POST',
-    //    // make sure you respect the same origin policy with this url:
-    //    // http://en.wikipedia.org/wiki/Same_origin_policy
-    //    url: 'https://igeturl.com/get.php',
-    //    data: {
-    //        url: "https://www.instagram.com/p/BgW8pj5Bx0R/"
-    //    },
-    //    success: function (msg) {
-    //        console.log('wow' + msg);
-    //    }
-    //});
-    console.log('------------------------------------------------');
-}
 
 function imgMouseOvered(evt) {
     console.log('------------------------------------------------');
@@ -350,7 +283,7 @@ function imgMouseOvered(evt) {
             }
             if (data) {
                 console.log('data', data);
-                chrome.storage.local.set({ "data": data }, function () { });
+                chrome.storage.local.set({ "downloadItem": data }, function () { });
             }
         }
 
@@ -433,16 +366,16 @@ function getFolder(pageUrl) {
             //
         } else if (isDomain(pageUrl, "tumblr")) {
             rootFolder = "tumblr/";
-            arrayUrl = pageUrl.split('/'); console.log('arrayUrl',arrayUrl);
+            arrayUrl = pageUrl.split('/'); console.log('arrayUrl', arrayUrl);
             subFolder = arrayUrl[2].split('.')[0] + '/'; console.log('subFolder', subFolder);
 
             var title = arrayUrl[5]; //console.log('title', title);
             if (title) {
                 title = decodeURI(title.split('?')[0]);
-                console.log('title', title );
-                folder = rootFolder + subFolder + decodeURI(title)+'/'; 
+                console.log('title', title);
+                folder = rootFolder + subFolder + decodeURI(title) + '/';
             } else {
-                folder = rootFolder + subFolder; 
+                folder = rootFolder + subFolder;
             }
             console.log('folder', folder); console.log('folder', folder);
             return folder;
@@ -455,4 +388,23 @@ function getFolder(pageUrl) {
         return '';
     }
     return '';
+}
+
+function getCaption(pageUrl) {
+    var rootDomain = extractRootDomain(pageUrl);
+    if (rootDomain) {
+        var caption;
+        if (isDomain(pageUrl, "instagram")) {
+            caption = $("title").text();
+            return caption.substring(caption.lastIndexOf('"') + 1, caption.lastIndexOf('"'));
+        } else if (isDomain(pageUrl, "flickr")) {
+            //
+        } else if (isDomain(pageUrl, "tumblr")) {
+            //
+        } else {
+            return '...';
+        }
+        return '...';
+    }
+    return '...';
 }
