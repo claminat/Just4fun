@@ -1,0 +1,107 @@
+﻿chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log('------------------------------------------------');
+    console.log('request', request);
+    if (request.text === 'download') {
+        var download = request.data;
+        console.log('download', download);
+        if (download) {
+            console.log('download.url', download.url); 
+            console.log('download.folder', download.folder); 
+            console.log('------------------------------------------------');
+            downloadUrl(download.url, download.folder);
+        }
+    }
+    console.log('------------------------------------------------');
+});
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log('------------------------------------------------');
+    console.log('request', request);
+    if (request.text === 'downloads') {
+        var downloads = request.data; console.log('downloads', downloads);
+        if (downloads) {
+            downloads.map(function (download) {
+                console.log('download', download);
+                if (download) {
+                    console.log('download.url', download.url);
+                    console.log('download.folder', download.folder);
+                    console.log('------------------------------------------------');
+                    downloadUrl(download.url, download.folder);
+                }
+            });
+        }
+    }
+});
+
+
+// A function to use as callback
+function callbackBrowserAction(downloads) {
+    console.log('------------------------------------------------');
+    console.log(arguments.callee.name);
+    if (downloads) {
+
+        console.log('downloads'); console.log(downloads);
+        console.log('------------------------------------------------');
+        $.each(downloads, function (index, download) {
+            console.log('download.url'); console.log(download.url);
+            console.log('download.folder'); console.log(download.folder);
+            console.log('------------------------------------------------');
+            if (download)
+                downloadUrl(download.url, download.folder);
+        });
+    } else {
+        console.log('Ăn lồn con đĩ.');
+    }
+}
+
+
+
+function getFolder(pageUrl) {
+    var rootDomain = extractRootDomain(pageUrl);
+    if (rootDomain) {
+        var rootFolder;
+        var arrayUrl;
+        var subFolder;
+        var folder;
+        if (isDomain(pageUrl, "instagram")) {
+            rootFolder = "instagram/";
+            arrayUrl = pageUrl.split('/');
+            console.log(arrayUrl);
+            subFolder = arrayUrl[5].split('=')[1] + '/';
+            console.log(subFolder);//console.log(subFolder);
+            folder = rootFolder + subFolder;//console.log(folder);
+            return folder;
+        } else if (isDomain(pageUrl, "flickr")) {
+            //
+        } else if (isDomain(pageUrl, "tumblr")) {
+            rootFolder = "tumblr/";
+            arrayUrl = pageUrl.split('/'); //console.log(arrayUrl);
+            subFolder = arrayUrl[2].split('.')[0] + '/'; //console.log(subFolder);
+            folder = rootFolder + subFolder;
+            console.log('folder', folder);//console.log(folder);
+            return folder;
+        } else {
+            var infoUrl = deconstructURL(pageUrl);
+            console.log('cUrlcUrl', infoUrl);
+            folder = infoUrl.hostname;
+            return folder;
+        }
+        return '';
+    }
+    return '';
+}
+
+
+
+function xxxRegexxx(url) {
+    var rootFolder = "instagram/";
+    var path = rootFolder;
+    var regexMain = new RegExp(/\?taken-by=(.*)/);
+    var regexSub = new RegExp(/https:\/\/www.instagram.com\/(.*)/);
+    if (url.match(regexMain)) {
+        path = path + url.match(regexMain).pop() + "/";
+    } else if (url.match(regexSub)) {
+        path = path + url.match(regexSub).pop();
+    }
+    return path;
+}

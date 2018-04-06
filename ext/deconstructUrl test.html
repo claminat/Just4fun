@@ -1,0 +1,55 @@
+<html>
+    <head>
+    </head>
+    <body>      
+    </body>
+    
+    
+    
+</html>
+
+
+<script src="deconstructUrl.js"></script>
+
+<script>
+/*
+    var eg1 = "http://username:password@example.com:8042/over/there/index.db?type=animal&name=narwhal#nose"
+    console.log("eg1 = ", eg1)
+    console.log("eg1 deconstruct = ", deconstructURL(eg1))
+    
+    var eg2 = "http://user:pass@www.google.com:80/images/srpr/logo3w.png"
+    console.log("eg2 = ", eg2)
+    console.log("eg2 deconstruct = ", deconstructURL(eg2))
+    
+    var eg3 = "http://www.google.com:80/images/srpr/logo3w.png"
+    console.log("eg3 = ", eg3)
+    console.log("eg3 deconstruct = ", deconstructURL(eg3))
+   
+*/    
+    
+    var egs = []                
+    egs.push("http://username:password@example.com:8042/over/there/index.db?type=animal&name=narwhal#nose")
+    egs.push("http://user:pass@www.google.com:80/images/srpr/logo3w.png")
+    egs.push("http://www.google.com:80/images/srpr/logo3w.png")
+    egs.push("http://www.google.com:80/images/srpr/logo.1.3w.png")
+    egs.push("http://en.manhua20.yourour.com/8/7213/85736/15_8662.png")
+    egs.push("http://www.dm5.com/m85736-p15/")
+	egs.push("file:///www.dm5.com/m85736-p15/")
+	egs.push("www.dm5.com/m85736-p15/")
+	egs.push("dm5.com/m85736-p15/")
+	egs.push("dm5.com")
+    egs.push("http://www.juego.com/juego38.gif")
+    egs.push("http://www.juego.com/skill.html?x=90&y=90")
+	egs.push("file:///www.juego.com/skill.html?x=90&y=90")
+	egs.push("http://www.dm5.com/m163737/#ipg2")
+    
+    for(var i in egs){
+        console.log("eg"+i+" = ", egs[i])
+        console.log("eg"+i+" deconstruct = ", deconstructURL(egs[i]) )
+        console.log("")
+        
+    }
+    
+    
+    
+</script>
