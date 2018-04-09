@@ -2,46 +2,56 @@
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//onMessage
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+    console.log('onMessage', 'request', request);
+    var data;
+    if (request.type === 'callContentScripts') {
+        console.log('onMessage', 'callContentScripts');
+        data = request.data;
+        console.log('data', data);
+        chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect' });
+        console.log('onMessage', 'callContentScripts', 'end', '------------------------------------------------');
+    }
+    if (request.type === 'openRedirect') {
+        console.log('onMessage', 'openRedirect');
+        data = request.data;
+        console.log('data', data);
+        openRedirect(data);
+        console.log('onMessage', 'openRedirect', 'end', '------------------------------------------------');
+    }
+
+});
+
+
+//contextMenus
+//#region contextMenus
 chrome.contextMenus.create({
     id: 'open',
     title: chrome.i18n.getMessage('openContextMenuTitle'),
     contexts: ["all", "image", "video"]
 });
-
-chrome.runtime.onMessage.addListener(function (request) {
-    console.log('request', 'openRedirect', request);
-    if (request.type === 'openRedirect') {
-        var data = request.data; console.log('data', data);
-        var srcUrl = data.downloadItem.url; console.log('srcUrl', srcUrl);
-
-        //chrome.tabs.create({ url: chrome.extension.getURL('redirect.html'), active: false }, function (tab) {
-        //    chrome.windows.create({// After the tab has been created, open a window to inject the tab
-        //        tabId: tab.id,type: 'popup',focused: true // incognito, top, left, ...
-        //    }, function (window) {
-        //        chrome.runtime.sendMessage({ data: srcUrl, type: 'callRedirect' });
-        //    });
-        //});
-    }
-    console.log('request', 'openRedirect', '------------------------------------------------');
-});
-
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
-    console.log('contextMenus.onClicked');
-    var pageUrl = info.pageUrl; console.log('pageUrl', pageUrl);
-    var srcUrl = info.srcUrl; console.log('srcUrl', srcUrl);
-    var title = tab.title;
-    var caption = title.substring(title.lastIndexOf("“") + 1, title.lastIndexOf("”"));
-    var downloadItem = { srcUrl: srcUrl, caption: caption}
-    console.log('tab', tab);
-    //popup redirect
-    if (srcUrl) {
-        if (checkURL(srcUrl)) {
-            console.log('downloadItem', downloadItem);
-            openRedirect(downloadItem);
-        } else {
-            createNotification('Invalid Url!');
-        }
-    }
+    console.log('contextMenus.onClicked', ' start ', '------------------------------------------------');
+
+    chrome.tabs.sendMessage(tab.id, { type: 'callContentScripts' }, function (response) {});
+
+    //var pageUrl = info.pageUrl; console.log('pageUrl', pageUrl);
+    //var srcUrl = info.srcUrl; console.log('srcUrl', srcUrl);
+    //var title = tab.title;
+    //var caption = title.substring(title.lastIndexOf("“") + 1, title.lastIndexOf("”"));
+    //var downloadItem = { srcUrl: srcUrl, caption: caption}
+    //console.log('tab', tab);
+    ////popup redirect
+    //if (srcUrl) {
+    //    if (checkURL(srcUrl)) {
+    //        console.log('downloadItem', downloadItem);
+    //        openRedirect(downloadItem);
+    //    } else {
+    //        createNotification('Invalid Url!');
+    //    }
+    //}
 
     ////download
     //var rootDomain = extractRootDomain(pageUrl);
@@ -62,8 +72,8 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 });
 
 function openRedirect(downloadItem) {
-    var w = 400;
-    var h = 400;
+    var w = 750;
+    var h = 750;
 
     // Fixes dual-screen position                         Most browsers      Firefox
     var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX;
@@ -82,7 +92,7 @@ function openRedirect(downloadItem) {
     ////var width = $(this).width(); console.log('width', width);
     ////var height = $(this).height(); console.log('height', height);
 
-    
+
 
     //var left = ((screenWidth / 2) - (w / 2)) ;
     //var top = ((screenHeight / 2) - (h / 2));
@@ -91,17 +101,17 @@ function openRedirect(downloadItem) {
         // After the tab has been created, open a window to inject the tab
         chrome.windows.create({
             tabId: tab.id, type: 'popup', focused: true,// incognito, top, left, ...
-            top:top,left:left,width:w,height:h
+            top: top, left: left, width: w, height: h
         }, function (window) {
             chrome.runtime.sendMessage({ data: downloadItem, type: 'callRedirect' });
         });
     });
 }
+//#endregion
 
+//browserAction
+//#region browserAction
 
-
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 chrome.browserAction.onClicked.addListener(function (tab) {
     var pageUrl = tab.url;
     var rootDomain = extractRootDomain(pageUrl);
@@ -123,7 +133,11 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 
     }
 });
-////++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//#endregion
+
+//onDeterminingFilename
+//#region onDeterminingFilename
 //var rulesets = {};
 //chrome.downloads.onDeterminingFilename.addListener(function (item, suggest) {
 //    console.log('-------------------------------------------------------------------------------');
@@ -153,3 +167,4 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 //    });
 //}
 
+//#endregion

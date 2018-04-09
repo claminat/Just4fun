@@ -1,9 +1,9 @@
-﻿chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    console.log('------------------------------------------------');
-    console.log('request', request);
-    if (request.text === 'download') {
-        var download = request.data;
-        console.log('download', download);
+﻿
+//onMessage
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    console.log('onMessage', 'request', request,'------------------------------------------------');
+    if (request.type === 'download') {
+        var download = request.data;console.log('download', download);
         if (download) {
             console.log('download.url', download.url); 
             console.log('download.folder', download.folder); 
@@ -11,13 +11,7 @@
             downloadUrl(download.url, download.folder);
         }
     }
-    console.log('------------------------------------------------');
-});
-
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    console.log('------------------------------------------------');
-    console.log('request', request);
-    if (request.text === 'downloads') {
+    if (request.type === 'downloads') {
         var downloads = request.data; console.log('downloads', downloads);
         if (downloads) {
             downloads.map(function (download) {
@@ -31,6 +25,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
         }
     }
+    console.log('------------------------------------------------');
 });
 
 

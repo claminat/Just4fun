@@ -4,55 +4,65 @@
 //https://www.kirupa.com/html5/get_element_position_using_javascript.htm
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 var debug = false;
-//if (debug === true) {
-//    console.logg = console.log;
-//} else {
-//    console.logg = function donothing() {
-//    }
-//}
+var downloads = [];
 
 if (debug) {
     console.log("(debug)Cái lồn con đĩ.");
 }
 
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Listen for messages
-chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-    console.log('chrome.runtime.onMessage.addListener');
-    // If the received message has the expected format...
-    if (msg.text === 'browserAction') {
-        console.log('browserAction');
-        // Call the specified callback, passing// the web-page's DOM content as argument
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    var pageUrl = window.location.href;
+    if (debug) {
+        console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+        console.log('onMessage', 'request', request);
+    }
+    if (request.type === 'browserAction') {
+        if (debug) {
+            console.log('browserAction', '------------------------------------------------');
+        }
         //sendResponse(document.all[0].outerHTML);
-        ////+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        var pageUrl = window.location.href;
-        ////+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        //download from 'downloads=[] variable'
-        chrome.runtime.sendMessage({ data: downloads, text: 'downloads' }, function (response) { });
+        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        if (debug) {
+            console.log('downloads', downloads);
+        }
+
+        chrome.runtime.sendMessage({ data: downloads, type: 'downloads' }, function (response) { });
+        if (debug) {
+            console.log('browserAction', 'end', '------------------------------------------------');
+        }
+            
+    }
+    if (request.type === 'callContentScripts') {
+        if (debug) {
+            console.log('callContentScripts', '------------------------------------------------');
+        }
+        var caption = getCaption(pageUrl);
+        $.map(downloads, function (download, i) {
+            download.caption = caption;
+        });
+        console.log('downloads', downloads);
+        chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect' });
+        if (debug)
+            console.log('callContentScripts', 'end', '------------------------------------------------');
     }
 });
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-var downloads = [];
 preLoad();
 
+
+//#region preLoad
 function preLoad() {
     console.log('----------start-', arguments.callee.name, '----------');
     var pageUrl = window.location.href;
     //instagram
     $("div").removeClass("_si7dy");
-    //$("div[class='_4rbun']").map(function (index) {
-    //    console.log('_4rbun', index, this);
-    //});
-    //
-
-    //getFolder(pageUrl);
-
 
     prepareDownload();
     console.log('----------end-', arguments.callee.name, '----------');
-
 }
 
 function prepareDownload() {
@@ -72,13 +82,13 @@ function prepareDownload() {
 }
 
 function prepareDownloadInstagram() {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
-    console.log('------------------------------------------------');
+    if (debug) {
+    console.log(arguments.callee.name,'------------------------------------------------');
+
+    }
     var pageUrl = window.location.href;
     var folder = getFolder(pageUrl);
     var caption = getCaption(pageUrl);
-    console.log('------------------------------------------------');
     //url
     $("meta[name='medium']").map(function (index) {
         //console.log('meta[name=\'medium\']', index, this.content);
@@ -112,7 +122,11 @@ function prepareDownloadInstagram() {
                                         caption: caption
                                     };
                                     downloads.push(download);
-                                    console.log('download', download);
+                                    if (debug) {
+                                        console.log('download', download);
+
+                                    }
+                                    
 
                                 });
                             } else {
@@ -125,7 +139,10 @@ function prepareDownloadInstagram() {
                                     caption: caption
                                 };
                                 downloads.push(download);
-                                console.log('download', download);
+                                if (debug) {
+                                    console.log('download', download);
+
+                                }
                             }
                         });
                     }
@@ -146,15 +163,23 @@ function prepareDownloadInstagram() {
                     caption: caption
                 };
                 downloads.push(download);
-                console.log('download', download);
+                if (debug) {
+                    console.log('download', download);
+
+                }
             });
         }
     });
+    if (debug) {
+        console.log('downloads', downloads);
+        console.log(arguments.callee.name, ' end ', '------------------------------------------------');
+    }
+    
+    
 }
 
 function prepareDownloadTumblr() {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
+    console.log(arguments.callee.name, ' start ', '------------------------------------------------');
     //folder
     var pageUrl = window.location.href;
     var folder = getFolder(pageUrl);
@@ -164,10 +189,7 @@ function prepareDownloadTumblr() {
     $("meta[property='og:image']").map(function (index) {
         console.log('og:image', index, this.content);
         var src = this.content;
-        var download = {
-            url: src,
-            folder: folder
-        };
+        var download = { url: src, folder: folder };
         downloads.push(download);
         console.log('download', download);
     });
@@ -175,14 +197,12 @@ function prepareDownloadTumblr() {
     $("img[class='small']").map(function (index) {
         console.log('img', index, this);
         var src = this.src;
-        var download = {
-            url: src,
-            folder: folder
-        };
-
+        var download = { url: src, folder: folder };
         downloads.push(download);
         console.log('download', download);
     });
+    console.log('downloads', downloads);
+
 
 
     //var arrayUrl = url.split('/'); //console.log(arrayUrl);
@@ -200,7 +220,11 @@ function prepareDownloadTumblr() {
     //        chrome.runtime.sendMessage({ data: download, text: 'download' }, function (response) {});
     //    });
     //});
+    console.log(arguments.callee.name, ' end ', '------------------------------------------------');
 }
+
+//#endregion
+
 
 //#region action
 
@@ -231,10 +255,7 @@ $('#barImgId').click(function () {
         if (downloadItem) {
             console.log('downloadItem', downloadItem);
             var data = { type: 'openRedirect', data: downloadItem };
-            chrome.runtime.sendMessage(data);
-
-            //chrome.runtime.sendMessage({ data: data, text: "download" }, function (response) { });
-
+            chrome.runtime.sendMessage(data, function (response) { });
         }
     });
 });
@@ -267,19 +288,19 @@ function imgMouseOvered(evt) {
 
         var pageUrl = window.location.href;
         var rootDomain = extractRootDomain(pageUrl);
+        var caption = getCaption(pageUrl);
         var data;
         if (rootDomain) {
             if (isDomain(pageUrl, "instagram")) {
-                //data = { url: src, folder: getFolder(pageUrl) };
-                imgMouseOveredInstagram(src);
+               //
             } else if (isDomain(pageUrl, "flickr")) {
-
+                //
             } else if (isDomain(pageUrl, "tumblr")) {
-                data = { url: src, folder: getFolder(pageUrl) };
+                data = { url: src, caption: caption, folder: getFolder(pageUrl) };
             } else {
                 var infoUrl = deconstructURL(pageUrl);
                 console.log('cUrlcUrl', infoUrl);
-                data = { url: src, folder: infoUrl.hostname + '/' };
+                data = { url: src, caption: caption, folder: infoUrl.hostname + '/' };
             }
             if (data) {
                 console.log('data', data);
@@ -345,8 +366,6 @@ function imgMouseOuted(evt) {
 //#endregion
 
 
-
-
 function getFolder(pageUrl) {
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
@@ -393,18 +412,16 @@ function getFolder(pageUrl) {
 function getCaption(pageUrl) {
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
-        var caption;
+        var caption='...';
         if (isDomain(pageUrl, "instagram")) {
             caption = $("title").text();
-            return caption.substring(caption.lastIndexOf('"') + 1, caption.lastIndexOf('"'));
-        } else if (isDomain(pageUrl, "flickr")) {
-            //
+            caption= caption.substring(caption.lastIndexOf('"') + 1, caption.lastIndexOf('"'));} else if (isDomain(pageUrl, "flickr")) {
+           
         } else if (isDomain(pageUrl, "tumblr")) {
-            //
-        } else {
-            return '...';
+            caption = $("title").text();
+           
         }
-        return '...';
+        return caption;
     }
     return '...';
 }

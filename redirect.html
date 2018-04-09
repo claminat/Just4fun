@@ -5,18 +5,30 @@
     <script type="text/javascript" src="javascripts/jquery-2.1.4.min.js"></script>
     <script src="javascripts/jquery.form-4.2.2/jquery.form.min.js"></script>
     <script type="text/javascript" src="javascripts/helpers.js"></script>
+    <script type="text/javascript" src="javascripts/coreClients.js"></script>
+
+    <link rel="stylesheet" href="bootstrap-3.3.5/dist/css/bootstrap.min.css">
+    <script src="bootstrap-3.3.5/dist/js/bootstrap.min.js"></script>
     <script src="javascripts/cores.js"></script>
 </head>
 <body>
-    <img style="max-height: 100%; max-width: 100%;" />
     <br />
-    <div></div>
-    <br />
-    <form>
 
-        <input id="caption">
-        <input type="submit" value="OK">
-    </form>
+    <div class="row well">
+        <input id="txtCaption">
+        <a type="submit" class="btn btn-primary pull-right post_all">Post Selected</a>
+    </div>
+
+    <table id="employee_grid" class="table table-condensed table-hover table-striped bootgrid-table" width="90%" cellspacing="0">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="master"></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
     <script src="redirect.js"></script>
 </body>
 </html>

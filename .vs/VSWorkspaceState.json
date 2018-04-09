@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\javascripts",
-    "\\javascripts\\socket.io-client-1.7.3"
+    "\\javascripts"
   ],
-  "SelectedNode": "\\backgroundPage.js",
+  "SelectedNode": "\\redirect.js",
   "PreviewInSolutionExplorer": false
 }
