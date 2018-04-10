@@ -82,20 +82,8 @@ function openRedirect(downloadItem) {
     var width = screen.width; console.log('screenWidth', width);
     var height = screen.height; console.log('screenHeight', height);
 
-    //var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-    //var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
     var left = ((width / 2) - (w / 2)) + dualScreenLeft;
     var top = ((height / 2) - (h / 2)) + dualScreenTop;
-
-
-    ////var width = $(this).width(); console.log('width', width);
-    ////var height = $(this).height(); console.log('height', height);
-
-
-
-    //var left = ((screenWidth / 2) - (w / 2)) ;
-    //var top = ((screenHeight / 2) - (h / 2));
 
     chrome.tabs.create({ url: chrome.extension.getURL('redirect.html'), active: false }, function (tab) {
         // After the tab has been created, open a window to inject the tab
