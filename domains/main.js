@@ -1,13 +1,12 @@
 ﻿
 //onMessage
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    console.log('onMessage', 'request', request,'------------------------------------------------');
+    if (debug) { console.log('onMessage', 'request', request, '------------------------------------------------');}
     if (request.type === 'download') {
         var download = request.data;console.log('download', download);
         if (download) {
             console.log('download.url', download.url); 
             console.log('download.folder', download.folder); 
-            console.log('------------------------------------------------');
             downloadUrl(download.url, download.folder);
         }
     }
@@ -19,28 +18,23 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 if (download) {
                     console.log('download.url', download.url);
                     console.log('download.folder', download.folder);
-                    console.log('------------------------------------------------');
+                   
                     downloadUrl(download.url, download.folder);
                 }
             });
         }
     }
-    console.log('------------------------------------------------');
 });
 
 
 // A function to use as callback
 function callbackBrowserAction(downloads) {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
+    console.log(arguments.callee.name, '------------------------------------------------');
     if (downloads) {
-
         console.log('downloads'); console.log(downloads);
-        console.log('------------------------------------------------');
         $.each(downloads, function (index, download) {
             console.log('download.url'); console.log(download.url);
             console.log('download.folder'); console.log(download.folder);
-            console.log('------------------------------------------------');
             if (download)
                 downloadUrl(download.url, download.folder);
         });
@@ -52,6 +46,7 @@ function callbackBrowserAction(downloads) {
 
 
 function getFolder(pageUrl) {
+    console.log(arguments.callee.name, '------------------------------------------------');
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
         var rootFolder;

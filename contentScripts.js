@@ -3,7 +3,7 @@
 //https://stackoverflow.com/questions/11553600/how-to-inject-css-using-content-script-file-in-chrome-extension/11554116
 //https://www.kirupa.com/html5/get_element_position_using_javascript.htm
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-var debug = false;
+//var debug = true;
 var downloads = [];
 
 if (debug) {
@@ -30,10 +30,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
 
         chrome.runtime.sendMessage({ data: downloads, type: 'downloads' }, function (response) { });
-        if (debug) {
-            console.log('browserAction', 'end', '------------------------------------------------');
-        }
-            
     }
     if (request.type === 'callContentScripts') {
         if (debug) {
@@ -43,31 +39,31 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         $.map(downloads, function (download, i) {
             download.caption = caption;
         });
-        console.log('downloads', downloads);
+        if (debug) {
+            console.log('downloads', downloads);
+        }
         chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect' });
-        if (debug)
-            console.log('callContentScripts', 'end', '------------------------------------------------');
     }
 });
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 preLoad();
 
-
 //#region preLoad
 function preLoad() {
-    console.log('----------start-', arguments.callee.name, '----------');
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     var pageUrl = window.location.href;
     //instagram
     $("div").removeClass("_si7dy");
-
     prepareDownload();
-    console.log('----------end-', arguments.callee.name, '----------');
 }
 
 function prepareDownload() {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     var pageUrl = window.location.href;
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
@@ -83,7 +79,7 @@ function prepareDownload() {
 
 function prepareDownloadInstagram() {
     if (debug) {
-    console.log(arguments.callee.name,'------------------------------------------------');
+        console.log(arguments.callee.name, '------------------------------------------------');
 
     }
     var pageUrl = window.location.href;
@@ -103,18 +99,27 @@ function prepareDownloadInstagram() {
                 //console.log('script', index, this);
                 var html = $(this).html();
                 if (has(html, 'window._sharedData =')) {
-                    console.log('script[', index, ']', this);
+                    if (debug) {
+                        console.log('script[', index, ']', this);
+
+                    }
+
                     var script = html.slice(0, -1).replace('window._sharedData =', ''); //console.log('script', index, script);
                     var json = jQuery.parseJSON(script); //console.log('json', json);
                     //var postPages = json.entry_data.PostPage[0];//console.log('postPage', postPages);
                     if (json) {
                         json.entry_data.PostPage.map(function (postPage) {
-                            console.log('postPage', postPage);
+                            if (debug) {
+                                console.log('postPage', postPage);
+                            }
                             if (postPage.graphql.shortcode_media.edge_sidecar_to_children) {
                                 var edges = postPage.graphql.shortcode_media.edge_sidecar_to_children.edges;
                                 edges.map(function (edge) {
                                     var display_url = edge.node.display_url;
-                                    console.log('display_url', display_url);
+                                    if (debug) {
+                                        console.log('display_url', display_url);
+                                    }
+
                                     var src = display_url;
                                     var download = {
                                         url: src,
@@ -124,14 +129,15 @@ function prepareDownloadInstagram() {
                                     downloads.push(download);
                                     if (debug) {
                                         console.log('download', download);
-
                                     }
-                                    
-
                                 });
                             } else {
                                 var display_url = postPage.graphql.shortcode_media.display_url;
-                                console.log('display_url', display_url);
+
+                                if (debug) {
+                                    console.log('display_url', display_url);
+
+                                }
                                 var src = display_url;
                                 var download = {
                                     url: src,
@@ -165,22 +171,22 @@ function prepareDownloadInstagram() {
                 downloads.push(download);
                 if (debug) {
                     console.log('download', download);
-
                 }
             });
         }
     });
     if (debug) {
         console.log('downloads', downloads);
-        console.log(arguments.callee.name, ' end ', '------------------------------------------------');
+
     }
-    
-    
+
+
 }
 
 function prepareDownloadTumblr() {
-    console.log(arguments.callee.name, ' start ', '------------------------------------------------');
-    //folder
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     var pageUrl = window.location.href;
     var folder = getFolder(pageUrl);
 
@@ -220,7 +226,7 @@ function prepareDownloadTumblr() {
     //        chrome.runtime.sendMessage({ data: download, text: 'download' }, function (response) {});
     //    });
     //});
-    console.log(arguments.callee.name, ' end ', '------------------------------------------------');
+
 }
 
 //#endregion
@@ -249,8 +255,9 @@ $(document).on("mouseout", 'img', imgMouseOuted);
 
 
 $('#barImgId').click(function () {
-    console.log("'#barImgId').click");
-    console.log('chrome.storage.local.get(["data"], function (data)');
+    if (debug) {
+        console.log("'#barImgId').click", '------------------------------------------------');
+    }
     chrome.storage.local.get(["downloadItem"], function (downloadItem) {
         if (downloadItem) {
             console.log('downloadItem', downloadItem);
@@ -260,22 +267,20 @@ $('#barImgId').click(function () {
     });
 });
 
-
-
 function imgMouseOvered(evt) {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
-
-    //console.log('posititon', getPosition(this));
-    //console.log('event', event);
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
 
     var width = $(this).width(); //console.log('width', width);
     var height = $(this).height(); //console.log('height', height);
 
-    var src = this.src; console.log('src', src);
-    if (evt.target.id == 'barImgId') {
+    var src = this.src; 
+    if (debug) { console.log('src', src);}
+
+    if (evt.target.id === 'barImgId') {
         if (debug) {
-            console.logg('barImgId');
+            console.log('barImgId');
         }
         $('#barImgId').css('opacity', 1);
         $('#barImgId').css('display', 'inline-block');
@@ -292,7 +297,7 @@ function imgMouseOvered(evt) {
         var data;
         if (rootDomain) {
             if (isDomain(pageUrl, "instagram")) {
-               //
+                data = { url: src, caption: caption, folder: getFolder(pageUrl) };
             } else if (isDomain(pageUrl, "flickr")) {
                 //
             } else if (isDomain(pageUrl, "tumblr")) {
@@ -337,8 +342,9 @@ function imgMouseOvered(evt) {
 //});
 
 function imgMouseOuted(evt) {
-    console.log('------------------------------------------------');
-    console.log(arguments.callee.name);
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     if (evt.target.id === 'barImgId') {
         return;
     }
@@ -367,6 +373,9 @@ function imgMouseOuted(evt) {
 
 
 function getFolder(pageUrl) {
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
         var rootFolder;
@@ -376,16 +385,19 @@ function getFolder(pageUrl) {
         if (isDomain(pageUrl, "instagram")) {
             rootFolder = "instagram/";
             arrayUrl = pageUrl.split('/');
-            console.log(arrayUrl);
             subFolder = arrayUrl[5].split('=')[1] + '/';
-            console.log(subFolder);//console.log(subFolder);
-            folder = rootFolder + subFolder;//console.log(folder);
+            folder = rootFolder + subFolder;
+            if (debug) {
+                console.log('arrayUrl', arrayUrl);
+                console.log('subFolder', subFolder);
+                console.log('folder', folder);
+            }
             return folder;
         } else if (isDomain(pageUrl, "flickr")) {
             //
         } else if (isDomain(pageUrl, "tumblr")) {
             rootFolder = "tumblr/";
-            arrayUrl = pageUrl.split('/'); console.log('arrayUrl', arrayUrl);
+            arrayUrl = pageUrl.split('/');
             subFolder = arrayUrl[2].split('.')[0] + '/'; console.log('subFolder', subFolder);
 
             var title = arrayUrl[5]; //console.log('title', title);
@@ -396,12 +408,21 @@ function getFolder(pageUrl) {
             } else {
                 folder = rootFolder + subFolder;
             }
-            console.log('folder', folder); console.log('folder', folder);
+            if (debug) {
+                console.log('arrayUrl', arrayUrl);
+                console.log('subFolder', subFolder);
+                console.log('folder', folder);
+            }
+
+
             return folder;
         } else {
             var infoUrl = deconstructURL(pageUrl);
-            console.log('cUrlcUrl', infoUrl);
+
             folder = infoUrl.hostname;
+            if (debug) {
+                console.log('cUrlcUrl', infoUrl);
+            }
             return folder;
         }
         return '';
@@ -410,16 +431,25 @@ function getFolder(pageUrl) {
 }
 
 function getCaption(pageUrl) {
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     var rootDomain = extractRootDomain(pageUrl);
     if (rootDomain) {
-        var caption='...';
+        var caption = '...';
         if (isDomain(pageUrl, "instagram")) {
             caption = $("title").text();
-            caption= caption.substring(caption.lastIndexOf('"') + 1, caption.lastIndexOf('"'));} else if (isDomain(pageUrl, "flickr")) {
-           
+            if (debug) {
+                console.log('caption', caption);
+            }
+            caption = caption.substring(caption.lastIndexOf('“') + 1, caption.lastIndexOf('”'));
+            if (debug) {
+                console.log('caption', caption);
+            }
+        } else if (isDomain(pageUrl, "flickr")) {
         } else if (isDomain(pageUrl, "tumblr")) {
             caption = $("title").text();
-           
+
         }
         return caption;
     }

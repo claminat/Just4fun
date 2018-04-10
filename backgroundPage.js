@@ -4,22 +4,27 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //onMessage
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-    console.log('onMessage', 'request', request);
+    if (debug) {
+        console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+        console.log('onMessage', 'request', request);
+    }
     var data;
     if (request.type === 'callContentScripts') {
-        console.log('onMessage', 'callContentScripts');
         data = request.data;
-        console.log('data', data);
+        if (debug) {
+            console.log('onMessage', 'callContentScripts');
+            console.log('data', data);
+        }
         chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect' });
-        console.log('onMessage', 'callContentScripts', 'end', '------------------------------------------------');
     }
     if (request.type === 'openRedirect') {
-        console.log('onMessage', 'openRedirect');
+        
         data = request.data;
-        console.log('data', data);
+        if (debug) {
+            console.log('onMessage', 'openRedirect');
+            console.log('data', data);
+        }
         openRedirect(data);
-        console.log('onMessage', 'openRedirect', 'end', '------------------------------------------------');
     }
 
 });
@@ -79,8 +84,8 @@ function openRedirect(downloadItem) {
     var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX;
     var dualScreenTop = window.screenTop != undefined ? window.screenTop : window.screenY;
 
-    var width = screen.width; console.log('screenWidth', width);
-    var height = screen.height; console.log('screenHeight', height);
+    var width = screen.width; 
+    var height = screen.height; 
 
     var left = ((width / 2) - (w / 2)) + dualScreenLeft;
     var top = ((height / 2) - (h / 2)) + dualScreenTop;

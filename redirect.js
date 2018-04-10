@@ -52,9 +52,11 @@ chrome.runtime.onMessage.addListener(function (request) {
         if (debug) {
             console.log('redirect', 'onMessage', 'callRedirect', 'request', request);
         }
-        var data = request.data; console.log('data', data);
+        var data = request.data;
+        if (debug) { console.log('data', data);}
         $.each(data, function (index, download) {
-            console.log(index, download);
+            
+            if (debug) { console.log(index, download); }
             var src = download.url;
             var caption = download.caption; console.log('caption', caption);
 
