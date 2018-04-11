@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
+    "\\domains",
     "\\javascripts"
   ],
-  "SelectedNode": "\\redirect.js",
+  "SelectedNode": "\\javascripts\\helpers.js",
   "PreviewInSolutionExplorer": false
 }
