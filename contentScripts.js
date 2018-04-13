@@ -275,8 +275,8 @@ function imgMouseOvered(evt) {
     var width = $(this).width(); //console.log('width', width);
     var height = $(this).height(); //console.log('height', height);
 
-    var src = this.src; 
-    if (debug) { console.log('src', src);}
+    var src = this.src;
+    if (debug) { console.log('src', src); }
 
     if (evt.target.id === 'barImgId') {
         if (debug) {
@@ -312,6 +312,8 @@ function imgMouseOvered(evt) {
                 chrome.storage.local.set({ "downloadItem": data }, function () { });
             }
         }
+
+
 
     }
     if (debug) {

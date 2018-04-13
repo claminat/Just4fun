@@ -4,8 +4,15 @@
     <script type="text/javascript" src="javascripts/socket.io-client-1.7.3/socket.io.js"></script>
     <script type="text/javascript" src="javascripts/jquery-2.1.4.min.js"></script>
     <script src="javascripts/jquery.form-4.2.2/jquery.form.min.js"></script>
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="javascripts/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="javascripts/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+
+
     <script type="text/javascript" src="javascripts/helpers.js"></script>
-    <script type="text/javascript" src="javascripts/coreClients.js"></script>
 
     <link rel="stylesheet" href="bootstrap-3.3.5/dist/css/bootstrap.min.css">
     <script src="bootstrap-3.3.5/dist/js/bootstrap.min.js"></script>
@@ -14,10 +21,14 @@
 <body>
     <br />
 
-    <div class="row well">
-        <input id="txtCaption">
-        <a type="submit" class="btn btn-primary pull-right post_all">Post Selected</a>
-    </div>
+<div class="row well">
+    <select class="selectpicker">
+    </select>
+
+   
+    <input class="form-control" id="txtCaption">
+    <a type="submit" class="btn btn-primary pull-right post_all">Post Selected</a>
+</div>
 
     <table id="employee_grid" class="table table-condensed table-hover table-striped bootgrid-table" width="90%" cellspacing="0">
         <thead>

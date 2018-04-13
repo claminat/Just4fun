@@ -1,5 +1,5 @@
 var debug = false;
-//debug = true;
+debug = true;
 
 function extractRootDomain(url) {
     var domain = extractHostname(url),
