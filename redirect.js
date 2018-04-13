@@ -4,9 +4,9 @@
 $(function () {
     var data = [
         {
-            "created_time": "2018-04-11T02:01:30+0000",
-            "name": "⚔⚔⚔ (.)(.) ⚔⚔⚔",
-            "id": "1675568209201022"
+            "created_time": "2018-04-13T08:02:48+0000",
+            "name": "emmyozawa",
+            "id": "1677907068967136"
         },
         {
             "created_time": "2017-07-03T07:48:29+0000",
@@ -14,9 +14,14 @@ $(function () {
             "id": "1403878896369956"
         },
         {
-            "created_time": "2018-04-11T01:54:24+0000",
-            "name": "☘☘☘ (y) ☘☘☘",
-            "id": "1675561319201711"
+            "created_time": "2018-04-13T07:48:41+0000",
+            "name": "fromise_",
+            "id": "1677893795635130"
+        },
+        {
+            "created_time": "2018-04-11T02:01:30+0000",
+            "name": "⚔⚔⚔ (.)(.) ⚔⚔⚔",
+            "id": "1675568209201022"
         },
         {
             "created_time": "2018-04-11T09:33:18+0000",
@@ -27,6 +32,11 @@ $(function () {
             "created_time": "2018-04-11T01:58:09+0000",
             "name": "❤️So cute ❤️",
             "id": "1675564655868044"
+        },
+        {
+            "created_time": "2018-04-11T01:54:24+0000",
+            "name": "☘☘☘ (y) ☘☘☘",
+            "id": "1675561319201711"
         },
         {
             "created_time": "2018-04-09T01:55:43+0000",
@@ -89,10 +99,6 @@ $(function () {
             "id": "1403736449717534"
         }
     ];
-    //$.each(data, function (i, option) {
-    //    $('.dropdown-menu').append("<li><a href=" + option.id + ">" + option.name + "</a></li>");
-    //});
-
 
     var dropdown = $('.selectpicker');
     dropdown.empty();
