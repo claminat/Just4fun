@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             var row = "<tr data-row-id='" + index + "'>" +
                 "<td><input type='checkbox' class='sub_chk' checked='checked' data-id='" + index + "'></td>" +
                 "<td align='center'><img data-id='" + index + "' caption='" + caption + "' folder='" + folder + "' src='" + srcUrl
-                + "' style='max-height: 150px; max-width:  150px;' /></td>" +
+                + "' style='max-height: 100px; max-width:  100px;' /></td>" +
                 "<td align='center'>" + caption + "</td>" +
 
                 "</tr>";
