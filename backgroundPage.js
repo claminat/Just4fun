@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         openRedirect(request.data, tab);
     }
 
-    if (request.type == "what is my tab_id?") {
+    if (request.type === "what is my tab_id?") {
         if (debug) { console.log('onMessage', 'what is my tab_id?'); }
         sendResponse({ tab: sender.tab });
     }
@@ -77,8 +77,6 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
     //        //createNotification('Invalid Url!');
     //    }
     //}
-    console.log('contextMenus.onClicked', '------------------------------------------------');
-
 });
 
 function openRedirect(data, ptab) {
