@@ -5,6 +5,7 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //var debug = true;
 var downloads = [];
+var downloadItems = [];
 
 if (debug) {
     console.log("(debug)Cái lồn con đĩ.");
@@ -18,6 +19,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (debug) {
         console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
         console.log('onMessage', 'request', request);
+        console.log('downloads', downloads);
     }
     if (request.type === 'browserAction') {
         if (debug) {
@@ -25,9 +27,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
         //sendResponse(document.all[0].outerHTML);
         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        if (debug) {
-            console.log('downloads', downloads);
-        }
+
 
         chrome.runtime.sendMessage({ data: downloads, type: 'downloads' }, function (response) { });
     }
@@ -39,10 +39,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         $.map(downloads, function (download, i) {
             download.caption = caption;
         });
-        if (debug) {
-            console.log('downloads', downloads);
-        }
-        chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect' });
+
+        console.log('request.tab', request.tab);
+        chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect', tab: request.tab }, function (response) { });
     }
 });
 
@@ -122,7 +121,7 @@ function prepareDownloadInstagram() {
 
                                     var src = display_url;
                                     var download = {
-                                        url: src,
+                                        srcUrl: src,
                                         folder: folder,
                                         caption: caption
                                     };
@@ -140,7 +139,7 @@ function prepareDownloadInstagram() {
                                 }
                                 var src = display_url;
                                 var download = {
-                                    url: src,
+                                    srcUrl: src,
                                     folder: folder,
                                     caption: caption
                                 };
@@ -164,7 +163,7 @@ function prepareDownloadInstagram() {
                 console.log('meta.content', index, this.content);
                 var src = this.content; console.log('src', src);
                 var download = {
-                    url: src,
+                    srcUrl: src,
                     folder: folder,
                     caption: caption
                 };
@@ -195,7 +194,7 @@ function prepareDownloadTumblr() {
     $("meta[property='og:image']").map(function (index) {
         console.log('og:image', index, this.content);
         var src = this.content;
-        var download = { url: src, folder: folder };
+        var download = { srcUrl: src, folder: folder };
         downloads.push(download);
         console.log('download', download);
     });
@@ -220,7 +219,7 @@ function prepareDownloadTumblr() {
     //        var src = this.href;
     //        console.log(index, 'iframe->a.href', this.href);
     //        var download = {
-    //            url: src,
+    //            srcUrl: src,
     //            folder: folder
     //        };
     //        chrome.runtime.sendMessage({ data: download, text: 'download' }, function (response) {});
@@ -258,13 +257,24 @@ $('#barImgId').click(function () {
     if (debug) {
         console.log("'#barImgId').click", '------------------------------------------------');
     }
-    chrome.storage.local.get(["downloadItem"], function (downloadItem) {
-        if (downloadItem) {
-            console.log('downloadItem', downloadItem);
-            var data = { type: 'openRedirect', data: downloadItem };
-            chrome.runtime.sendMessage(data, function (response) { });
-        }
-    });
+    if (downloadItems) {
+        console.log('downloadItem', downloadItems);
+        chrome.runtime.sendMessage({ type: "what is my tab_id?" }, function(response) {
+            console.log('response', response);
+            var tab = response.tab;
+            chrome.runtime.sendMessage({ data: downloadItems, type: 'openRedirect', tab }, function (response) { });
+
+        });
+        //chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        //    var myTabId = tabs[0].id;
+        //    chrome.tabs.sendMessage(myTabId, { text: "hi" }, function (response) {
+        //        //alert(response);
+        //        console.log('response', response);
+
+        //    });
+        //});
+        
+    }
 });
 
 function imgMouseOvered(evt) {
@@ -272,11 +282,16 @@ function imgMouseOvered(evt) {
         console.log(arguments.callee.name, '------------------------------------------------');
     }
 
-    var width = $(this).width(); //console.log('width', width);
-    var height = $(this).height(); //console.log('height', height);
+    var width = $(this).width();
+   
+    var height = $(this).height(); 
+    if (debug) {
+        console.log('width', width);
+        console.log('height', height);
+    }
 
-    var src = this.src;
-    if (debug) { console.log('src', src); }
+    var srcUrl = this.src;
+    if (debug) { console.log('srcUrl', srcUrl); }
 
     if (evt.target.id === 'barImgId') {
         if (debug) {
@@ -297,23 +312,22 @@ function imgMouseOvered(evt) {
         var data;
         if (rootDomain) {
             if (isDomain(pageUrl, "instagram")) {
-                data = { url: src, caption: caption, folder: getFolder(pageUrl) };
+                data = { srcUrl: srcUrl, caption: caption, folder: getFolder(pageUrl) };
             } else if (isDomain(pageUrl, "flickr")) {
                 //
             } else if (isDomain(pageUrl, "tumblr")) {
-                data = { url: src, caption: caption, folder: getFolder(pageUrl) };
+                data = { srcUrl: srcUrl, caption: caption, folder: getFolder(pageUrl) };
             } else {
                 var infoUrl = deconstructURL(pageUrl);
                 console.log('cUrlcUrl', infoUrl);
-                data = { url: src, caption: caption, folder: infoUrl.hostname + '/' };
+                data = { srcUrl: srcUrl, caption: caption, folder: infoUrl.hostname + '/' };
             }
             if (data) {
                 console.log('data', data);
-                chrome.storage.local.set({ "downloadItem": data }, function () { });
+                downloadItems = [];
+                downloadItems.push(data);
             }
         }
-
-
 
     }
     if (debug) {

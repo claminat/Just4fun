@@ -22,12 +22,14 @@
     <br />
 
 <div class="row well">
-    <select class="selectpicker">
-    </select>
 
-   
+    <div class="form-check">
+        <select class="selectpicker"></select>
+        <input class="form-check-input position-static" type="checkbox" id="downloadCheckbox" value="option1" aria-label="..." checked>  <label id="downloadLabel" >Download</label>
+    </div>
     <input class="form-control" id="txtCaption">
-    <a type="submit" class="btn btn-primary pull-right post_all">Post Selected</a>
+    <a type="submit" class="btn btn-primary pull-right post_all">Post Selected<span class="badge">0</span></a>
+
 </div>
 
     <table id="employee_grid" class="table table-condensed table-hover table-striped bootgrid-table" width="90%" cellspacing="0">

@@ -4,29 +4,32 @@
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //onMessage
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+
+    var data = request.data;//var tab = request.tab;
+    var tab = sender.tab;
     if (debug) {
         console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
         console.log('onMessage', 'request', request);
+        console.log('onMessage', 'data', data);
+        console.log('onMessage', 'tab', tab);
     }
-    var data;
+
     if (request.type === 'callContentScripts') {
-        data = request.data;
         if (debug) {
             console.log('onMessage', 'callContentScripts');
-            console.log('data', data);
         }
         chrome.runtime.sendMessage({ data: downloads, type: 'openRedirect' });
     }
     if (request.type === 'openRedirect') {
-        
-        data = request.data;
-        if (debug) {
-            console.log('onMessage', 'openRedirect');
-            console.log('data', data);
-        }
-        openRedirect(data);
+        if (debug) { console.log('onMessage', 'openRedirect'); }
+
+        openRedirect(request.data, tab);
     }
 
+    if (request.type == "what is my tab_id?") {
+        if (debug) { console.log('onMessage', 'what is my tab_id?'); }
+        sendResponse({ tab: sender.tab });
+    }
 });
 
 
@@ -37,10 +40,12 @@ chrome.contextMenus.create({
     title: chrome.i18n.getMessage('openContextMenuTitle'),
     contexts: ["all", "image", "video"]
 });
+
+
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
     console.log('contextMenus.onClicked', ' start ', '------------------------------------------------');
-
-    chrome.tabs.sendMessage(tab.id, { type: 'callContentScripts' }, function (response) {});
+    //console.log('tab.id', tab.id);
+    chrome.tabs.sendMessage(tab.id, { type: 'callContentScripts', tab }, function (response) { });
 
     //var pageUrl = info.pageUrl; console.log('pageUrl', pageUrl);
     //var srcUrl = info.srcUrl; console.log('srcUrl', srcUrl);
@@ -76,7 +81,10 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 
 });
 
-function openRedirect(downloadItem) {
+function openRedirect(data, ptab) {
+    if (debug) {
+        console.log(arguments.callee.name, '------------------------------------------------');
+    }
     var w = 750;
     var h = 750;
 
@@ -84,8 +92,8 @@ function openRedirect(downloadItem) {
     var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX;
     var dualScreenTop = window.screenTop != undefined ? window.screenTop : window.screenY;
 
-    var width = screen.width; 
-    var height = screen.height; 
+    var width = screen.width;
+    var height = screen.height;
 
     var left = ((width / 2) - (w / 2)) + dualScreenLeft;
     var top = ((height / 2) - (h / 2)) + dualScreenTop;
@@ -96,7 +104,10 @@ function openRedirect(downloadItem) {
             tabId: tab.id, type: 'popup', focused: true,// incognito, top, left, ...
             top: top, left: left, width: w, height: h
         }, function (window) {
-            chrome.runtime.sendMessage({ data: downloadItem, type: 'callRedirect' });
+            if (debug) {
+                console.log('ptab', ptab);
+            }
+            chrome.runtime.sendMessage({ data, type: 'callRedirect', tab: ptab });
         });
     });
 }

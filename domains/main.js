@@ -5,9 +5,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.type === 'download') {
         var download = request.data;console.log('download', download);
         if (download) {
-            console.log('download.url', download.url); 
+            console.log('download.srcUrl', download.srcUrl); 
             console.log('download.folder', download.folder); 
-            downloadUrl(download.url, download.folder);
+            downloadUrl(download.srcUrl, download.folder);
         }
     }
     if (request.type === 'downloads') {
@@ -16,10 +16,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             downloads.map(function (download) {
                 console.log('download', download);
                 if (download) {
-                    console.log('download.url', download.url);
+                    console.log('download.srcUrl', download.srcUrl);
                     console.log('download.folder', download.folder);
                    
-                    downloadUrl(download.url, download.folder);
+                    downloadUrl(download.srcUrl, download.folder);
                 }
             });
         }
