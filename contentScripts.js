@@ -202,7 +202,7 @@ function prepareDownloadTumblr() {
     $("img[class='small']").map(function (index) {
         console.log('img', index, this);
         var src = this.src;
-        var download = { url: src, folder: folder };
+        var download = { srcUrl: src, folder: folder };
         downloads.push(download);
         console.log('download', download);
     });
