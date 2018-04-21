@@ -190,6 +190,9 @@ function prepareDownloadTumblr() {
     var folder = getFolder(pageUrl);
 
     var postId = pageUrl.split('/')[4]; console.log(postId);
+    var frameId = 'photoset_iframe_' + postId; console.log('frameId', frameId);
+    var frame = "iframe[id*='" + frameId + "']"; console.log('frame', frame);
+
     console.log('------------------------------------------------');
     $("meta[property='og:image']").map(function (index) {
         console.log('og:image', index, this.content);
@@ -208,21 +211,32 @@ function prepareDownloadTumblr() {
     });
     console.log('downloads', downloads);
 
+   
+    $('#' + frameId).load(function () {
+        $('#' + frameId).contents().find('a').map(function (index) {
+            var src = this.href;
+            console.log('a', index, this);
+            var download = {
+                srcUrl: src,
+                folder: folder
+            };
+            downloads.push(download);
+        });
+    });
 
-
-    //var arrayUrl = url.split('/'); //console.log(arrayUrl);
-    //var postId = arrayUrl[4]; //console.log(postId);
-    //return postId;
-    //$("iframe[id*='photoset_iframe_" + postId + "']").map(function (index) {
+    //$(frame).map(function (index) {
     //    console.log('iframe', index, this);
-    //    $(this).contents().find("a").map(function (index) {
+    //    console.log('body', $(this).contents().find("body"));
+    //    console.log('html', $(this).contents().find("body").html);
+
+    //    $(this).contents().find("body").find("a").map(function (index) {
     //        var src = this.href;
-    //        console.log(index, 'iframe->a.href', this.href);
+    //        console.log('a', index, this);
     //        var download = {
     //            srcUrl: src,
     //            folder: folder
     //        };
-    //        chrome.runtime.sendMessage({ data: download, text: 'download' }, function (response) {});
+    //        //chrome.runtime.sendMessage({ data: download, text: 'download' }, function (response) {});
     //    });
     //});
 
@@ -259,7 +273,7 @@ $('#barImgId').click(function () {
     }
     if (downloadItems) {
         console.log('downloadItem', downloadItems);
-        chrome.runtime.sendMessage({ type: "what is my tab_id?" }, function(response) {
+        chrome.runtime.sendMessage({ type: "what is my tab_id?" }, function (response) {
             console.log('response', response);
             var tab = response.tab;
             chrome.runtime.sendMessage({ data: downloadItems, type: 'openRedirect', tab }, function (response) { });
@@ -273,7 +287,7 @@ $('#barImgId').click(function () {
 
         //    });
         //});
-        
+
     }
 });
 
@@ -283,8 +297,8 @@ function imgMouseOvered(evt) {
     }
 
     var width = $(this).width();
-   
-    var height = $(this).height(); 
+
+    var height = $(this).height();
     if (debug) {
         console.log('width', width);
         console.log('height', height);
